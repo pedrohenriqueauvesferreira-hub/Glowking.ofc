@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>GlowKing – Alcance seu GLOW UP</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <h1 class="logo">Alcance seu GLOW UP</h1>
+  <p class="subtitle">Entre na comunidade exclusiva e transforme sua aparência e autoestima.</p>
+  <a href="#oferta" class="btn">Quero entrar no GlowKing</a>
+</header>
+
+<main>
+  <section id="oferta" class="section">
+    <h2>Acesso imediato</h2>
+    <p>Envie <strong>R$ 20,00</strong> via PIX para a chave abaixo. Após confirmar o pagamento o acesso ao grupo do Telegram será liberado.</p>
+    <div class="pix-box">
+      <div class="pix-label">Chave PIX (CPF/chave):</div>
+      <div class="pix-key" id="pixKey">70702965170</div>
+      <button class="btn small" id="copyPix">Copiar chave PIX</button>
+    </div>
+
+    <p class="obs">Após fazer o PIX, clique em <strong>"Já paguei"</strong> e siga as instruções para enviar o comprovante. O acesso ao grupo só será liberado após a confirmação do pagamento.</p>
+
+    <div class="actions">
+      <a class="btn" id="jaPaguei">Já paguei</a>
+    </div>
+  </section>
+
+  <section class="section" id="statusSection" style="display:none;">
+    <h2 id="statusTitle">Aguardando confirmação</h2>
+    <p id="statusText">Seu pagamento ainda não foi confirmado. Envie o comprovante para que possamos liberar seu acesso assim que confirmado.</p>
+    <button class="btn" id="enterGroup" style="display:none;" onclick="window.open('https://t.me/+uQ-uhoWWjsUzZTQx','_blank')">Entrar no grupo</button>
+  </section>
+
+  <section class="section" id="faq">
+    <h2>Como funciona (resumo)</h2>
+    <ol>
+      <li>Copie a chave PIX e faça a transferência de R$20,00.</li>
+      <li>Clique em <strong>Já paguei</strong> e envie o comprovante por e-mail ou WhatsApp.</li>
+      <li>O administrador confere o comprovante e, se estiver tudo certo, liberará seu acesso.</li>
+    </ol>
+    <p>Observação: para automações (liberar automaticamente após PIX confirmado) é necessário integrar um provedor de pagamentos (ex.: Gerencianet, Mercado Pago ou Pagar.me). Veja o README incluído.</p>
+  </section>
+</main>
+
+<!-- Modal -->
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <button class="modal-close" id="closeModal">&times;</button>
+    <h3>Envie seu comprovante</h3>
+    <p>Você pode enviar o comprovante por e-mail ou abrir o WhatsApp para enviar a foto diretamente ao administrador.</p>
+
+    <form id="comprovanteForm">
+      <label for="nome">Seu nome</label>
+      <input id="nome" name="nome" required>
+      <label for="email">Seu e-mail</label>
+      <input id="email" name="email" type="email" required>
+      <label for="txid">(Opcional) ID da transação / TxID</label>
+      <input id="txid" name="txid" placeholder="se disponível">
+      <p class="small">Anexe o comprovante no e-mail que vai abrir (ou envie pelo WhatsApp).</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="sendMail">Enviar por e-mail</button>
+        <button type="button" class="btn outline" id="openWhats">Enviar pelo WhatsApp</button>
+      </div>
+    </form>
+
+    <hr>
+    <h4>Já recebeu o código de confirmação?</h4>
+    <p>Se o administrador já conferiu seu comprovante, ele pode enviar um <strong>código único</strong> para você. Cole abaixo para liberar o acesso automaticamente.</p>
+    <input id="adminCodeInput" placeholder="Cole o código aqui">
+    <div style="margin-top:12px;">
+      <button class="btn" id="validateCode">Validar código</button>
+    </div>
+    <p class="small">O código é gerado manualmente pelo administrador após verificar o comprovante.</p>
+  </div>
+</div>
+
+<footer>
+  © 2025 GlowKing
+</footer>
+
+<script>
+// Copy PIX key
+document.getElementById('copyPix').addEventListener('click', function(){
+  const pix = document.getElementById('pixKey').innerText;
+  navigator.clipboard.writeText(pix).then(() => {
+    alert('Chave PIX copiada para a área de transferência.');
+  });
+});
+
+// Modal controls
+const modal = document.getElementById('modal');
+const jaPaguei = document.getElementById('jaPaguei');
+const closeModal = document.getElementById('closeModal');
+jaPaguei.addEventListener('click', () => {
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+});
+closeModal.addEventListener('click', () => {
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+});
+
+// Send mail action (mailto fallback)
+document.getElementById('sendMail').addEventListener('click', () => {
+  const nome = document.getElementById('nome').value || '';
+  const email = document.getElementById('email').value || '';
+  const txid = document.getElementById('txid').value || '';
+  const pix = document.getElementById('pixKey').innerText;
+  if (!nome || !email) {
+    alert('Por favor preencha nome e e-mail.');
+    return;
+  }
+  // IMPORTANT: replace admin@example.com with your real admin email before publishing
+  const adminEmail = 'admin@example.com';
+  const subject = encodeURIComponent('Comprovante de pagamento - GlowKing - ' + nome);
+  const body = encodeURIComponent('Nome: ' + nome + '\nE-mail: ' + email + '\nPIX: ' + pix + '\nTxID: ' + txid + '\n\nPor favor, anexo o comprovante a este e-mail.');
+  window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
+  alert('Seu aplicativo de e-mail será aberto. Anexe o comprovante e envie. Depois aguarde a confirmação do administrador.');
+});
+
+// Open WhatsApp
+document.getElementById('openWhats').addEventListener('click', () => {
+  // IMPORTANT: replace phone number below with the admin's WhatsApp phone in international format (ex: 5511999999999)
+  const phone = '5511999999999';
+  const nome = encodeURIComponent(document.getElementById('nome').value || '');
+  const pix = encodeURIComponent(document.getElementById('pixKey').innerText);
+  const text = encodeURIComponent(`Olá, acabei de fazer o PIX para ${pix}. Meu nome: ${nome}. Envio o comprovante em seguida.`);
+  window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+});
+
+// Validate admin code (client-side)
+document.getElementById('validateCode').addEventListener('click', () => {
+  const code = document.getElementById('adminCodeInput').value.trim();
+  if (!code) {
+    alert('Insira o código que o administrador forneceu.');
+    return;
+  }
+  const validCodes = JSON.parse(localStorage.getItem('glow_valid_codes') || '[]');
+  if (validCodes.includes(code)) {
+    // show success section and enable button
+    document.getElementById('statusSection').style.display = 'block';
+    document.getElementById('statusTitle').innerText = '✅ Pagamento confirmado';
+    document.getElementById('statusText').innerText = 'Seu pagamento foi confirmado. Clique no botão abaixo para entrar no grupo do Telegram.';
+    document.getElementById('enterGroup').style.display = 'inline-block';
+    modal.style.display = 'none';
+  } else {
+    alert('Código inválido. Aguarde a confirmação do administrador.');
+  }
+});
+</script>
+</body>
+</html>

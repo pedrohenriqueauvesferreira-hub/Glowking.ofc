@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>GlowKing — Painel Admin (local)</title>
+<style>
+body{font-family:Arial;margin:20px;background:#f5f5f5;color:#222}
+.container{max-width:700px;margin:auto;background:#fff;padding:20px;border-radius:8px}
+input{width:100%;padding:10px;margin-top:8px;border:1px solid #ccc;border-radius:6px}
+button{padding:10px 14px;margin-top:10px;border:0;background:#222;color:#fff;border-radius:6px}
+.codes{margin-top:12px}
+.codes li{background:#eef;padding:8px;border-radius:6px;margin-top:6px}
+p.small{color:#666}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Painel Admin (local)</h2>
+  <p class="small">Este painel adiciona códigos válidos na máquina do administrador (localStorage). após gerar um código para um pagamento confirmado, envie-o para o aluno. Este método é manual e funciona sem servidor.</p>
+  <label>Novo código (ex: ABC123)</label>
+  <input id="newCode">
+  <button id="addCode">Adicionar código</button>
+  <button id="clearCodes" style="background:#a00">Limpar todos os códigos</button>
+
+  <h3>Códigos válidos</h3>
+  <ul id="codesList" class="codes"></ul>
+  <p class="small">Observação: isso armazena os códigos apenas no seu navegador. Para automatizar a liberação é necessário usar um provedor de pagamento e um servidor.</p>
+</div>
+<script>
+function render(){
+  const codes = JSON.parse(localStorage.getItem('glow_valid_codes') || '[]');
+  const list = document.getElementById('codesList');
+  list.innerHTML = '';
+  codes.forEach(c => {
+    const li = document.createElement('li'); li.innerText = c; list.appendChild(li);
+  });
+}
+document.getElementById('addCode').addEventListener('click', () => {
+  const v = document.getElementById('newCode').value.trim();
+  if(!v) return alert('Informe um código.');
+  const codes = JSON.parse(localStorage.getItem('glow_valid_codes') || '[]');
+  codes.push(v);
+  localStorage.setItem('glow_valid_codes', JSON.stringify(codes));
+  document.getElementById('newCode').value = '';
+  render();
+});
+document.getElementById('clearCodes').addEventListener('click', () => {
+  if(confirm('Remover todos os códigos?')) {
+    localStorage.removeItem('glow_valid_codes');
+    render();
+  }
+});
+render();
+</script>
+</body>
+</html>
